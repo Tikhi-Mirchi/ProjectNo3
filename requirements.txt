@@ -1,0 +1,7 @@
+# ============================================================
+# PYTHON REQUIREMENTS — requirements.txt
+# ============================================================
+# This repository is a Next.js/TypeScript app.
+# Node dependencies are installed via `npm install`.
+#
+# Add Python packages here only if you add Python tooling/scripts.

@@ -1,0 +1,121 @@
+# ============================================================
+# Framify Setup Guide
+# Full-stack: Next.js Frontend + FastAPI Backend
+# ============================================================
+
+ARCHITECTURE:
+- Frontend: Next.js 14 (App Router) → runs on port 3001
+- Backend:  FastAPI + Uvicorn       → runs on port 8000
+- Database: MongoDB (Compass / Atlas)
+
+IMPORTANT:
+- Frontend code lives in `Frontend/`
+- Backend code lives in `Backend/`
+- Each has its own .env file
+
+# ============================================================
+# 1) PREREQUISITES
+# ============================================================
+- Node.js 18+ (for Frontend)
+- Python 3.10+ (for Backend)
+- MongoDB Compass or MongoDB Atlas account
+
+# ============================================================
+# 2) MONGODB SETUP
+# ============================================================
+Option A: Local (MongoDB Compass)
+1. Download & install: https://www.mongodb.com/products/compass
+2. Start MongoDB service
+3. Default URI: mongodb://localhost:27017/framify
+
+Option B: Cloud (MongoDB Atlas)
+1. Create cluster at: https://cloud.mongodb.com
+2. Get connection URI from cluster dashboard
+3. Whitelist your IP in Network Access
+
+Collections are auto-created by the backend:
+- users, customizations, exports
+
+# ============================================================
+# 3) BACKEND SETUP (FastAPI)
+# ============================================================
+1. cd Backend
+2. python -m venv .venv
+3. Activate:
+   Windows:  .\.venv\Scripts\Activate.ps1
+   Mac/Linux: source .venv/bin/activate
+4. pip install -r requirements.txt
+5. Fill in Backend/.env:
+   MONGODB_URI=mongodb://localhost:27017/framify
+   DATABASE_NAME=framify
+   JWT_SECRET=<random-string>
+   GOOGLE_CLIENT_ID=<from-google-cloud-console>
+   GOOGLE_CLIENT_SECRET=<from-google-cloud-console>
+   OPENROUTER_API_KEY=<your-key>
+   FRONTEND_URL=http://localhost:3001
+6. Start server:
+   uvicorn app.main:app --reload --port 8000
+7. Verify: http://localhost:8000/health
+
+# ============================================================
+# 4) GOOGLE OAUTH SETUP
+# ============================================================
+1. Go to: https://console.cloud.google.com
+2. Create/select project
+3. APIs & Services → Credentials → Create OAuth 2.0 Client ID
+4. Application type: Web application
+5. Authorized redirect URIs:
+   - http://localhost:3001/auth/callback (frontend callback)
+6. Copy Client ID and Client Secret
+7. Add to Backend/.env AND Frontend/.env.local
+
+# ============================================================
+# 5) FRONTEND SETUP (Next.js)
+# ============================================================
+1. cd Frontend
+2. npm install
+3. Fill in Frontend/.env.local:
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=<same-as-backend>
+   NEXT_PUBLIC_APP_URL=http://localhost:3001
+   NEXT_PUBLIC_APP_NAME=Framify
+4. npm run dev
+5. Opens at: http://localhost:3001
+
+# ============================================================
+# 6) OPENROUTER (AI Copy Generation)
+# ============================================================
+1. Get API key from: https://openrouter.ai
+2. Add to Backend/.env:
+   OPENROUTER_API_KEY=sk-or-v1-...
+3. Test: POST http://localhost:8000/api/generate-copy
+
+# ============================================================
+# 7) API ENDPOINTS (Backend)
+# ============================================================
+Health:
+  GET  /           → status check
+  GET  /health     → DB status
+
+Auth:
+  POST /auth/google  → Google OAuth code exchange
+  POST /auth/login   → email/password login
+  POST /auth/signup  → email/password signup
+  GET  /auth/me      → current user (JWT required)
+
+API:
+  POST   /api/generate-copy         → AI copy generation
+  GET    /api/customizations        → list saved settings (JWT)
+  GET    /api/customizations/{id}   → get single (JWT)
+  POST   /api/customizations        → save/update (JWT)
+  DELETE /api/customizations/{id}   → delete (JWT)
+  POST   /api/export                → download template ZIP
+
+# ============================================================
+# 8) STARTUP CHECKLIST
+# ============================================================
+1. MongoDB running (local or Atlas)
+2. Backend:  cd Backend  → activate venv → uvicorn app.main:app --reload --port 8000
+3. Frontend: cd Frontend → npm run dev
+4. Verify: http://localhost:8000/health → { "status": "ok", "database": "connected" }
+5. Verify: http://localhost:3001 → Homepage loads

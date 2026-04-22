@@ -1,0 +1,634 @@
+# MASTER CLAUDE CODE PROMPT
+### Senior Prompt Engineer Edition — Premium Landing Page Template Platform
+
+---
+
+## ROLE & CONTEXT
+
+You are a senior fullstack engineer and UI architect working on a premium landing page template platform. This platform is the Dribbble of website templates — a curated, visually stunning gallery of 15–20 production-ready Next.js landing page templates that users can customize through a settings panel, preview in real time, and export as a complete Next.js ZIP project.
+
+You are building this with two developers. Your codebase is clean, opinionated, and scalable. Every decision you make should reflect senior-level judgment: prefer composition over complexity, encapsulate correctly, and never sacrifice code quality for speed.
+
+---
+
+## PROJECT OVERVIEW
+
+**Platform name:** [Velora / Pagerift / Launchly — TBD]
+**Framework:** Next.js 14+ (App Router)
+**Language:** TypeScript (strict mode)
+**Styling:** Tailwind CSS + CSS Custom Properties (token system)
+**State:** Zustand
+**Auth + DB:** Supabase
+**UI Components:** Shadcn/ui
+**Animations (platform):** Framer Motion
+**Animations (templates):** GSAP + ScrollTrigger
+**3D (templates):** React Three Fiber + Drei
+**2D animations:** Lottie React
+**Icons:** Lucide React
+
+---
+
+## SYSTEM REQUIREMENTS
+
+Before writing any code, generate a `requirements.txt` file at the project root with the following structure:
+
+```
+# ============================================================
+# PLATFORM REQUIREMENTS — requirements.txt
+# Premium Landing Page Template Platform
+# ============================================================
+
+# ── Core Framework ──────────────────────────────────────────
+next@14.2.x
+react@18.x
+react-dom@18.x
+typescript@5.x
+
+# ── Styling ─────────────────────────────────────────────────
+tailwindcss@3.x
+postcss@8.x
+autoprefixer@10.x
+@tailwindcss/typography
+clsx
+tailwind-merge
+
+# ── UI Components ───────────────────────────────────────────
+@radix-ui/react-dialog
+@radix-ui/react-tabs
+@radix-ui/react-slider
+@radix-ui/react-select
+@radix-ui/react-switch
+@radix-ui/react-tooltip
+@radix-ui/react-popover
+lucide-react
+shadcn-ui
+
+# ── State Management ────────────────────────────────────────
+zustand@4.x
+immer
+
+# ── Animation (Platform UI) ─────────────────────────────────
+framer-motion@11.x
+
+# ── Animation (Templates) ───────────────────────────────────
+gsap@3.x
+@gsap/react
+lottie-react@2.x
+
+# ── 3D (Templates) ──────────────────────────────────────────
+three@0.165.x
+@react-three/fiber@8.x
+@react-three/drei@9.x
+@react-three/postprocessing
+
+# ── Auth + Database ─────────────────────────────────────────
+@supabase/supabase-js@2.x
+@supabase/ssr
+
+# ── File Export ─────────────────────────────────────────────
+jszip@3.x
+file-saver@2.x
+
+# ── AI / Claude Integration ─────────────────────────────────
+@anthropic-ai/sdk@0.x
+
+# ── Fonts ───────────────────────────────────────────────────
+geist@1.x
+
+# ── Forms + Validation ──────────────────────────────────────
+react-hook-form@7.x
+zod@3.x
+@hookform/resolvers
+
+# ── Image Handling ──────────────────────────────────────────
+sharp@0.33.x
+react-dropzone@14.x
+
+# ── Dev Tools ───────────────────────────────────────────────
+eslint@8.x
+eslint-config-next
+prettier@3.x
+prettier-plugin-tailwindcss
+@types/react
+@types/node
+@types/three
+@types/file-saver
+```
+
+After generating `requirements.txt`, install all dependencies and confirm zero peer dependency conflicts before proceeding.
+
+---
+
+## TASK 1 — PROJECT SCAFFOLD
+
+Create the following directory structure:
+
+```
+/
+├── app/
+│   ├── (platform)/
+│   │   ├── page.tsx                    # Homepage gallery
+│   │   ├── templates/
+│   │   │   └── [slug]/
+│   │   │       ├── page.tsx            # Template full preview
+│   │   │       └── customize/
+│   │   │           └── page.tsx        # Editor view
+│   │   ├── dashboard/
+│   │   │   └── page.tsx
+│   │   └── auth/
+│   │       ├── login/page.tsx
+│   │       └── signup/page.tsx
+│   └── api/
+│       ├── export/route.ts             # ZIP export endpoint
+│       ├── customizations/route.ts     # Save/load settings
+│       └── generate-copy/route.ts      # Claude AI copy generation
+├── components/
+│   ├── platform/
+│   │   ├── TemplateGallery.tsx
+│   │   ├── TemplateCard.tsx
+│   │   ├── CategoryFilter.tsx
+│   │   ├── SettingsPanel/
+│   │   │   ├── index.tsx
+│   │   │   ├── BrandTab.tsx
+│   │   │   ├── TypographyTab.tsx
+│   │   │   ├── ContentTab.tsx
+│   │   │   ├── MediaTab.tsx
+│   │   │   └── AITab.tsx
+│   │   ├── PreviewFrame.tsx
+│   │   └── ExportButton.tsx
+│   └── ui/                             # Shadcn components
+├── templates/
+│   ├── _base/
+│   │   ├── tokens.css                  # CSS custom property map
+│   │   └── template.config.ts          # Schema for settings
+│   ├── obsidian/
+│   ├── aurora/
+│   ├── stark/
+│   ├── luminary/
+│   ├── prism/
+│   ├── carbon/
+│   ├── bloom/
+│   ├── apex/
+│   ├── kinetic/
+│   └── stellar/
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts
+│   │   └── server.ts
+│   ├── export/
+│   │   ├── buildZip.ts
+│   │   └── injectTokens.ts
+│   ├── claude/
+│   │   └── generateCopy.ts
+│   └── store/
+│       └── editorStore.ts              # Zustand store
+├── types/
+│   ├── template.ts
+│   └── settings.ts
+├── public/
+│   └── thumbnails/
+├── requirements.txt                    ← GENERATE THIS FIRST
+├── tailwind.config.ts
+├── next.config.ts
+└── tsconfig.json
+```
+
+---
+
+## TASK 2 — SETTINGS TOKEN SYSTEM
+
+This is the most critical engineering piece. Build it first.
+
+### 2a. Define the token schema (`types/settings.ts`)
+
+```typescript
+export interface TemplateSettings {
+  brand: {
+    primaryColor: string;       // hex
+    secondaryColor: string;     // hex
+    accentColor: string;        // hex
+    backgroundColor: string;    // hex
+    textColor: string;          // hex
+    logoUrl: string | null;
+    logoText: string;
+  };
+  typography: {
+    headingFont: string;        // Google Font name
+    bodyFont: string;
+    headingWeight: 400 | 500 | 600 | 700 | 800 | 900;
+    baseFontSize: 'sm' | 'md' | 'lg';
+  };
+  content: {
+    headline: string;
+    subheadline: string;
+    ctaText: string;
+    ctaUrl: string;
+    features: Array<{ title: string; description: string }>;
+    footerText: string;
+  };
+  media: {
+    heroImageUrl: string | null;
+    productImageUrl: string | null;
+    logoImageUrl: string | null;
+  };
+}
+
+export type TemplateSettingsKey = keyof TemplateSettings;
+```
+
+### 2b. Build the CSS injection engine (`lib/store/editorStore.ts`)
+
+```typescript
+// Zustand store — single source of truth for all editor state
+// On any settings change, call injectCSSTokens(settings) immediately
+// This mutates :root CSS vars on the preview iframe's document
+// DO NOT re-render the template component — only mutate CSS vars
+
+export const useEditorStore = create<EditorStore>()(
+  immer((set, get) => ({
+    settings: defaultSettings,
+    isDirty: false,
+    updateSetting: (path, value) => {
+      set(state => {
+        // deep set via path string e.g. 'brand.primaryColor'
+        // then call injectCSSTokens(state.settings)
+      });
+    },
+    resetToDefaults: () => { ... },
+    undo: () => { ... },
+    redo: () => { ... },
+  }))
+);
+```
+
+### 2c. Token injection function (`lib/export/injectTokens.ts`)
+
+```typescript
+// Map TemplateSettings → CSS custom properties
+// Inject into preview iframe document.documentElement style
+// All templates MUST consume only these variables — never hardcode colors
+
+export function buildCSSTokens(settings: TemplateSettings): Record<string, string> {
+  return {
+    '--color-primary':     settings.brand.primaryColor,
+    '--color-secondary':   settings.brand.secondaryColor,
+    '--color-accent':      settings.brand.accentColor,
+    '--color-bg':          settings.brand.backgroundColor,
+    '--color-text':        settings.brand.textColor,
+    '--font-heading':      `'${settings.typography.headingFont}', sans-serif`,
+    '--font-body':         `'${settings.typography.bodyFont}', sans-serif`,
+    '--font-weight-heading': String(settings.typography.headingWeight),
+  };
+}
+
+export function injectCSSTokens(
+  iframeRef: React.RefObject<HTMLIFrameElement>,
+  settings: TemplateSettings
+): void {
+  const tokens = buildCSSTokens(settings);
+  const iframeDoc = iframeRef.current?.contentDocument;
+  if (!iframeDoc) return;
+  const root = iframeDoc.documentElement;
+  Object.entries(tokens).forEach(([key, value]) => {
+    root.style.setProperty(key, value);
+  });
+}
+```
+
+---
+
+## TASK 3 — TEMPLATE ARCHITECTURE
+
+Every template MUST follow this contract:
+
+```typescript
+// templates/_base/template.config.ts
+export interface TemplateConfig {
+  id: string;
+  name: string;
+  slug: string;
+  category: TemplateCategory;
+  tags: string[];
+  style: 'dark' | 'light' | 'both';
+  hasThreeJS: boolean;
+  hasGSAP: boolean;
+  hasLottie: boolean;
+  defaultSettings: TemplateSettings;
+  thumbnail: string;
+  previewUrl: string;
+}
+
+export type TemplateCategory =
+  | 'saas' | 'agency' | 'portfolio' | 'startup'
+  | 'app' | 'ecommerce' | 'creator' | 'ai-tool'
+  | 'event' | 'wellness' | 'coming-soon';
+```
+
+Every template component must:
+- Consume ONLY CSS custom properties for all colors and fonts — zero hardcoded values
+- Have a `<TemplateWrapper>` root component that applies the token layer
+- Export sections as isolated components (HeroSection, FeaturesSection, etc.)
+- Include its own `defaultSettings: TemplateSettings` export
+- Lazy-load all Three.js and GSAP imports to prevent blocking the platform
+
+---
+
+## TASK 4 — TEMPLATE BUILDS
+
+Build each template with the following visual specification. Every template must be genuinely premium — not a generic layout with a color change. Study and apply the following visual design language for each:
+
+### TEMPLATE 1 — "Obsidian" (SaaS / Dark)
+- **Background:** Deep #0a0a0f with subtle blue-black gradient overlay
+- **Hero:** Glassmorphism card floating with `backdrop-filter: blur(20px)`, border `1px solid rgba(255,255,255,0.08)`
+- **3D:** React Three Fiber floating geometric mesh (icosahedron) with soft glow material, auto-rotating
+- **Animations:** GSAP ScrollTrigger — sections fade + translateY on scroll entry
+- **Accent:** Electric blue `#3b82f6` with radial glow behind CTA button
+- **Typography:** Heading — Inter 800, Body — Inter 400
+- **Sections:** Hero (with 3D), Features grid (glassmorphism cards), Social proof marquee, Pricing table, CTA section, Footer
+- **Premium detail:** Animated gradient border on featured pricing card, subtle particle field in hero background (canvas)
+
+### TEMPLATE 2 — "Aurora" (AI Product / Light)
+- **Background:** White `#fafafa` with aurora mesh gradient `linear-gradient(135deg, #e0e7ff 0%, #f0fdf4 50%, #fdf4ff 100%)` in hero
+- **Hero:** Floating UI mockup screenshot in a subtle device frame, soft drop shadow
+- **2D:** Lottie animation of abstract neural network nodes for feature icons
+- **Animations:** Framer Motion stagger children animations on scroll
+- **Accent:** Violet `#7c3aed`
+- **Typography:** Heading — Plus Jakarta Sans 700, Body — Inter 400
+- **Sections:** Navbar, Hero, Logos marquee (trusted by), Features (alternating left-right), Testimonials, Pricing, Footer
+- **Premium detail:** Animated gradient text on headline using `background-clip: text`, animated border-beam on hero card
+
+### TEMPLATE 3 — "Stark" (Agency / Ultra-Minimal Light)
+- **Background:** Pure white `#ffffff`
+- **Hero:** Full-width editorial layout — enormous 120px heading, single-line subtext, one CTA. No imagery. Typography IS the design.
+- **Animations:** Smooth character-by-character text reveal on page load (GSAP SplitText)
+- **Accent:** Single pop color — bright red `#ef4444` used ONLY on CTA and hover states
+- **Typography:** Heading — Editorial New / Playfair Display 900 italic, Body — DM Sans 400
+- **Sections:** Minimal nav, Hero, Work gallery (masonry grid), Services list, Contact CTA, Footer
+- **Premium detail:** Custom cursor — a small circle that follows mouse with magnetic effect on interactive elements, horizontal scroll work gallery
+
+### TEMPLATE 4 — "Luminary" (Portfolio / Dark Editorial)
+- **Background:** Near-black `#111111`
+- **Hero:** Big serif headline with a warm amber `#f59e0b` accent word, project grid below fold
+- **2D:** Lottie particle/sparkle animation as decorative element
+- **Animations:** GSAP — projects reveal with stagger + clip-path animation (curtain wipe)
+- **Typography:** Heading — Cormorant Garamond 700, Body — Inter 400
+- **Sections:** Nav, Hero statement, Selected work (masonry), About, Skills/stack, Contact, Footer
+- **Premium detail:** Hover on project cards — image zooms slightly, title slides up, overlay fades in. Smooth page transitions.
+
+### TEMPLATE 5 — "Prism" (Startup Launch / Bold Light)
+- **Background:** White with gradient sections — hero ends in a diagonal colour cut
+- **Hero:** React Three Fiber 3D crystal prism with refraction material, rainbow caustics effect. Dramatic center placement.
+- **Animations:** GSAP — prism rotates on scroll, sections slide in from alternating sides
+- **Accent:** Gradient — `linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)`
+- **Typography:** Heading — Sora 800, Body — Sora 400
+- **Sections:** Navbar, Hero + 3D prism, Features (icon grid with gradient icons), How it works (numbered steps), Team, FAQ (accordion), CTA, Footer
+- **Premium detail:** Gradient text on headline, floating gradient orbs as background decoration, CTA button has animated shimmer effect
+
+### TEMPLATE 6 — "Carbon" (Dev Tool / Terminal Dark)
+- **Background:** `#0d1117` (GitHub-dark level darkness)
+- **Hero:** Animated terminal / code editor mockup — typewriter effect simulates real command execution
+- **2D:** SVG animated code brackets, syntax highlight color blocks
+- **Animations:** GSAP — terminal lines type in sequentially on load, features grid slides in
+- **Accent:** Neon green `#22c55e` on terminal text, blue `#60a5fa` on keywords
+- **Typography:** Heading — JetBrains Mono 700, Body — JetBrains Mono 400 (all mono — this IS the brand)
+- **Sections:** Nav, Terminal hero, Features (dark cards with code snippet examples), CLI command showcase, GitHub stars social proof, Pricing, Footer
+- **Premium detail:** Animated line numbers, fake git diff in a feature card, glowing green cursor in terminal
+
+### TEMPLATE 7 — "Bloom" (Creator / Personal Brand / Light Soft)
+- **Background:** Warm white `#fffdf7` with soft peach / lilac gradient sections
+- **Hero:** Large friendly illustration (Lottie animation — abstract floral/organic shapes)
+- **Animations:** CSS + Framer Motion — bouncy spring animations on card entries, playful hover states
+- **Accent:** Warm rose `#f43f5e` with soft shadows
+- **Typography:** Heading — Bricolage Grotesque 700, Body — Plus Jakarta Sans 400
+- **Sections:** Nav, Hero + illustration, About, Content/work grid, Newsletter signup, Testimonials carousel, Footer
+- **Premium detail:** Wavy SVG section dividers between sections, confetti animation on CTA hover, rounded-3xl everywhere for a friendly feel
+
+### TEMPLATE 8 — "Apex" (B2B SaaS / Enterprise Light)
+- **Background:** Clean white with `#f8fafc` section alternation
+- **Hero:** Split layout — left: headline + CTA + trust badges, right: product screenshot in browser frame
+- **Animations:** GSAP ScrollTrigger — feature items reveal with subtle fade + slide up on scroll
+- **Accent:** Professional blue `#2563eb`
+- **Typography:** Heading — Inter 700, Body — Inter 400
+- **Sections:** Nav, Hero, Logos bar, Features (3-column with icons), Deep feature (alternating), Testimonials, Pricing (3 tiers), FAQ, CTA, Footer
+- **Premium detail:** Animated number counter on stats section (0 → target on scroll), feature comparison table with animated checkmarks, browser mockup with subtle drop shadow
+
+### TEMPLATE 9 — "Kinetic" (Mobile App / Motion)
+- **Background:** Deep navy `#020617` with subtle blue gradient
+- **Hero:** 3D phone mockup (React Three Fiber) that rotates on scroll — screen shows animated app UI
+- **Animations:** GSAP — phone tilts and rotates in 3D as user scrolls, feature cards slide into view
+- **Accent:** Electric blue `#38bdf8`
+- **Typography:** Heading — Outfit 800, Body — Outfit 400
+- **Sections:** Nav, App hero + 3D phone, Feature highlights (scroll-synced), Screenshots carousel, Reviews, Download CTA (App Store / Play Store buttons), Footer
+- **Premium detail:** Parallax depth effect on background layers, animated app store download button with shimmer, floating notification bubbles around phone mockup
+
+### TEMPLATE 10 — "Stellar" (AI Startup / Space Dark)
+- **Background:** `#02040a` space black with animated star field (canvas particle system)
+- **Hero:** Orbital UI element — animated SVG rings around a central core, React Three Fiber abstract sphere
+- **Animations:** GSAP — stars drift slowly, orbit rings spin, sections ascend into view
+- **Accent:** Cyan `#06b6d4` and soft white
+- **Typography:** Heading — Space Grotesk 700, Body — Space Grotesk 400
+- **Sections:** Nav, Hero + orbiting element + star field, How it works (timeline), Features, Use cases (tabbed), API teaser (code block), CTA, Footer
+- **Premium detail:** Gradient glow behind hero sphere, animated orbit path SVGs, code syntax highlight in API section, floating "live" indicator badge
+
+---
+
+## TASK 5 — SETTINGS PANEL UI
+
+Build a 30%-width sidebar settings panel with four tabs:
+
+**Tab: Brand**
+- Primary color — color picker + hex input + 6 preset palettes per template
+- Secondary color — same
+- Accent color — same
+- Background color — same
+- Logo — text input OR image upload (react-dropzone → Supabase Storage)
+- Mode toggle — Light / Dark (where template supports both)
+
+**Tab: Typography**
+- Heading font — searchable dropdown of curated 12 Google Fonts
+- Body font — same list
+- Font scale — Small / Medium / Large (maps to CSS `font-size` multiplier)
+- Heading weight — slider 400 → 900
+
+**Tab: Content**
+- Headline — textarea (max 80 chars, live char count)
+- Subheadline — textarea (max 160 chars)
+- CTA label — text input
+- CTA URL — text input with URL validation
+- Features — repeatable field group (title + description), up to 6
+- Footer text — text input
+
+**Tab: AI Copy (Claude-powered)**
+- Product type — text input ("what does your product do?")
+- Target audience — text input ("who is it for?")
+- Tone — select: Bold & Direct / Professional & Clean / Warm & Friendly / Playful & Creative
+- Generate button → calls `/api/generate-copy`
+- Response auto-fills all Content tab fields
+- Individual field "regenerate" icon per field
+- Show Claude attribution subtly: "Powered by Claude"
+
+---
+
+## TASK 6 — CLAUDE AI COPY GENERATION API
+
+Build `/api/generate-copy/route.ts`:
+
+```typescript
+// System prompt must include:
+// 1. Template name and niche context
+// 2. Visual personality of the chosen template
+// 3. Tone instruction from user selection
+// 4. Target word counts per field
+// 5. JSON-only response instruction — no preamble, no markdown
+
+// User prompt construction:
+// "Generate landing page copy for: [product description].
+//  Target audience: [audience].
+//  Template: [templateName] — a [templateStyle] design for [templateCategory].
+//  Tone: [toneInstruction].
+//  Return ONLY a JSON object with this exact shape: { headline, subheadline, ctaText, features: [{title, description}] x3, footerText }"
+
+// Parse response, validate with Zod schema, return to client
+// On parse failure: retry once with stricter prompt, then return 422
+```
+
+---
+
+## TASK 7 — EXPORT SYSTEM
+
+Build `/api/export/route.ts`:
+
+1. Receive: `{ templateId, settings: TemplateSettings, userId }`
+2. Read template source from `/templates/[id]/` directory on the server
+3. Run `injectTokensIntoFiles(templateSource, settings)`:
+   - Replace `var(--color-primary)` occurrences already there — leave as-is, they work
+   - Write `tokens.css` with all CSS vars baked in
+   - Update `tailwind.config.ts` with brand colors
+   - Replace content placeholders: `{{HEADLINE}}`, `{{CTA_TEXT}}` etc.
+4. Generate a `README.md` inside the ZIP:
+   ```
+   # [Template Name] — exported from [Platform Name]
+   ## Setup
+   npm install && npm run dev
+   ## Deploy to Vercel
+   npx vercel
+   ## Customization
+   Edit tokens.css to change colors and fonts.
+   ```
+5. Bundle with JSZip, stream to client as `template-[slug]-[timestamp].zip`
+6. Log export event to `exports` table in Supabase
+
+---
+
+## TASK 8 — DATABASE SCHEMA (Supabase)
+
+Run these SQL migrations in order:
+
+```sql
+-- Users (extends Supabase auth.users)
+create table public.profiles (
+  id uuid references auth.users primary key,
+  username text unique,
+  avatar_url text,
+  created_at timestamptz default now()
+);
+
+-- Templates registry
+create table public.templates (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  name text not null,
+  category text not null,
+  tags text[],
+  thumbnail_url text,
+  is_featured boolean default false,
+  has_threejs boolean default false,
+  has_gsap boolean default false,
+  created_at timestamptz default now()
+);
+
+-- User customizations (JSONB for flexible settings per template)
+create table public.customizations (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users not null,
+  template_id uuid references public.templates not null,
+  settings jsonb not null default '{}',
+  updated_at timestamptz default now(),
+  unique(user_id, template_id)
+);
+
+-- Favorites
+create table public.favorites (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users not null,
+  template_id uuid references public.templates not null,
+  created_at timestamptz default now(),
+  unique(user_id, template_id)
+);
+
+-- Exports (analytics)
+create table public.exports (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users,
+  template_id uuid references public.templates not null,
+  exported_at timestamptz default now()
+);
+
+-- Row Level Security
+alter table public.customizations enable row level security;
+create policy "Users manage own customizations"
+  on public.customizations for all
+  using (auth.uid() = user_id);
+
+alter table public.favorites enable row level security;
+create policy "Users manage own favorites"
+  on public.favorites for all
+  using (auth.uid() = user_id);
+```
+
+---
+
+## TASK 9 — PLATFORM HOMEPAGE
+
+The homepage is your most important marketing asset. Build it to be genuinely stunning:
+
+- **Hero section:** Large bold headline. Animated gradient text. Below: auto-scrolling horizontal template preview strip.
+- **Gallery grid:** `auto-fit minmax(340px, 1fr)` grid. Template cards show thumbnail, on hover — animated looping video preview or CSS animation. Category badge overlay.
+- **Category filter:** Sticky horizontal pill filter bar. Animated active state. Filters gallery with Framer Motion layout animations.
+- **Stats bar:** Animated counters — "10 Templates", "3 Categories", "100% Free", "Next.js native"
+- **Dark mode:** Platform supports dark/light, defaults dark for drama.
+
+---
+
+## QUALITY RULES — NON-NEGOTIABLE
+
+1. Every component has a TypeScript interface — no `any` types
+2. All CSS values in templates use `var(--token)` — zero hardcoded hex values
+3. Three.js scenes must lazy load with React.lazy + Suspense — never block LCP
+4. GSAP animations must check `prefers-reduced-motion` and skip if set
+5. All images use `next/image` with proper `alt` text
+6. Export ZIP must contain working code that passes `npm run build` on first try
+7. Supabase queries use RLS — never expose another user's data
+8. All API routes validate input with Zod before processing
+9. Settings panel autosaves with 2-second debounce — never loses user work
+10. Mobile responsive — platform UI works at 375px minimum viewport
+
+---
+
+## OUTPUT ORDER
+
+Execute in this exact sequence:
+1. Generate `requirements.txt`
+2. Scaffold directory structure
+3. Install dependencies
+4. Build token system + Zustand store
+5. Build settings panel UI
+6. Build template base contract + first 3 templates
+7. Build export system
+8. Build Claude copy generation API
+9. Build platform homepage
+10. Build auth + dashboard
+11. Seed database with template registry
+12. Final QA pass — run `npm run build`, fix all errors
+
+After each task, confirm completion and list what was built before proceeding.
