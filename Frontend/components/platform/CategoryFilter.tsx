@@ -6,12 +6,13 @@ interface CategoryFilterProps {
   categories: string[];
   value: string;
   onChange: (value: string) => void;
+  sticky?: boolean;
 }
 
-export function CategoryFilter({ categories, value, onChange }: CategoryFilterProps) {
+export function CategoryFilter({ categories, value, onChange, sticky = true }: CategoryFilterProps) {
   return (
-    <div className="sticky top-20 z-30 mx-auto max-w-3xl">
-      <div className="flex items-center gap-1.5 overflow-x-auto rounded-2xl border border-white/[0.04] bg-zinc-950/80 p-1.5 backdrop-blur-xl scrollbar-none">
+    <div className={`${sticky ? "sticky top-20 z-30" : ""} mx-auto max-w-3xl`}>
+      <div className="flex items-center gap-1.5 overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-xl scrollbar-none">
         {categories.map((category) => (
           <button
             key={category}
@@ -22,7 +23,7 @@ export function CategoryFilter({ categories, value, onChange }: CategoryFilterPr
             {value === category && (
               <motion.div
                 layoutId="active-category"
-                className="absolute inset-0 rounded-xl bg-white/[0.08]"
+                className="absolute inset-0 rounded-xl bg-white/[0.10]"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
               />
             )}

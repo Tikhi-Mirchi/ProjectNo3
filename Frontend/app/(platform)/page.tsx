@@ -7,7 +7,9 @@ import { useRef, useState } from "react";
 import { Navbar } from "@/components/platform/Navbar";
 import { Footer } from "@/components/platform/Footer";
 import { TemplateGallery } from "@/components/platform/TemplateGallery";
-import { AnimatedBlock } from "@/components/platform/AnimatedBlock";
+import { CategoryFilter } from "@/components/platform/CategoryFilter";
+import { getCategories } from "@/lib/templates/registry";
+import { TopWebsitesSection } from "@/components/platform/TopWebsitesSection";
 
 export default function PlatformHomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -15,6 +17,8 @@ export default function PlatformHomePage() {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const categories = getCategories();
 
   return (
     <>
@@ -98,6 +102,11 @@ export default function PlatformHomePage() {
                   </button>
                 ))}
               </div>
+
+              {/* Category bar (moved up under search + popular) */}
+              <div className="mt-5">
+                <CategoryFilter categories={categories} value={category} onChange={setCategory} sticky={false} />
+              </div>
             </motion.div>
 
             {/* CTA Buttons */}
@@ -147,9 +156,6 @@ export default function PlatformHomePage() {
           </motion.div>
         </section>
 
-        {/* ═══ ANIMATED BLOCK (Photo 1) ═══ */}
-        <AnimatedBlock />
-
         {/* ═══ FEATURES ═══ */}
         <section className="relative px-6 py-24">
           <div className="mx-auto max-w-6xl">
@@ -172,6 +178,9 @@ export default function PlatformHomePage() {
           </div>
         </section>
 
+        {/* ═══ TOP WEBSITES (before gallery) ═══ */}
+        <TopWebsitesSection />
+
         {/* ═══ GALLERY ═══ */}
         <section id="gallery" className="relative px-6 pb-28">
           <div className="mx-auto max-w-7xl">
@@ -184,7 +193,7 @@ export default function PlatformHomePage() {
                 Studio-grade designs with unique visual identities. Pick a template, make it yours, export clean code.
               </p>
             </motion.div>
-            <TemplateGallery />
+            <TemplateGallery category={category} onCategoryChange={setCategory} showFilter={false} />
           </div>
         </section>
 

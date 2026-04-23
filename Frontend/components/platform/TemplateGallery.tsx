@@ -6,9 +6,17 @@ import { TemplateCard } from "./TemplateCard";
 import { CategoryFilter } from "./CategoryFilter";
 import { templateConfigs, getCategories } from "@/lib/templates/registry";
 
-export function TemplateGallery() {
+export type TemplateGalleryProps = {
+  category?: string;
+  onCategoryChange?: (category: string) => void;
+  showFilter?: boolean;
+};
+
+export function TemplateGallery({ category: categoryProp, onCategoryChange, showFilter = true }: TemplateGalleryProps) {
   const categories = useMemo(() => getCategories(), []);
-  const [category, setCategory] = useState("all");
+  const [categoryInternal, setCategoryInternal] = useState("all");
+  const category = categoryProp ?? categoryInternal;
+  const setCategory = onCategoryChange ?? setCategoryInternal;
 
   const filtered = useMemo(
     () =>
@@ -20,11 +28,9 @@ export function TemplateGallery() {
 
   return (
     <section className="space-y-8">
-      <CategoryFilter
-        categories={categories}
-        value={category}
-        onChange={setCategory}
-      />
+      {showFilter && (
+        <CategoryFilter categories={categories} value={category} onChange={setCategory} />
+      )}
 
       <motion.div
         layout
